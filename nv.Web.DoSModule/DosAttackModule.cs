@@ -1,24 +1,79 @@
 ﻿using System;
 using System.Web;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
 using System.Net;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace nv.Web.Modules
 {
     public class DoSAttackModule : IHttpModule
     {
+        private const string DEFAULT_TRUSTED_IP_REGEX = @"^10\.10\.0\.|^192\.168\.|^127\.0\.0\.1$|^::1$|^0\.0\.0\.0$";
         private static Dictionary<string, byte> _ipAddresses = new Dictionary<string, byte>();
         private static Dictionary<string,DateTime> _ipBannedUntil = new System.Collections.Generic.Dictionary<string,DateTime>();
         private static DateTime _dateLastCleaned;
         private static bool _isCleanRunning;
-        private const short MAX_CONCURRENT_REQUESTS = 40;
-        private const int REDUCTION_INTERVAL_IN_SECONDS = 1; // How often cleanup should run
-        private const int RELEASE_INTERVAL_IN_MINUTES = 2; // How many minutes to block them for.
+        private static byte _maxConcurrentRequests = 32;
+        private static int _cleanupFrequencyInSeconds = 1;
+        private static int _banTimeoutInMinutes = 2;
+        private static Regex _trustedIpRegex;
+
+        static DoSAttackModule()
+        {
+            Configure();
+        }
+
+        private static void Configure()
+        {
+            string configMaxConcurrentRequests = System.Configuration.ConfigurationManager.AppSettings.Get("DoSAttackModule.MaxConcurrentRequests");
+            byte maxConcurrentRequests;
+            if (byte.TryParse(configMaxConcurrentRequests, out maxConcurrentRequests))
+            {
+                _maxConcurrentRequests = maxConcurrentRequests;
+            }
+
+            string configCleanupFrequencyInSeconds = System.Configuration.ConfigurationManager.AppSettings.Get("DoSAttackModule.CleanupFrequencyInSeconds");
+            byte cleanupFrequencyInSeconds;
+            if (byte.TryParse(configCleanupFrequencyInSeconds, out cleanupFrequencyInSeconds))
+            {
+                _cleanupFrequencyInSeconds = cleanupFrequencyInSeconds;
+            }
+
+            string configBanTimeoutInMinutes = System.Configuration.ConfigurationManager.AppSettings.Get("DoSAttackModule.BanTimeoutInMinutes");
+            byte banTimeoutInMinutes;
+            if (byte.TryParse(configBanTimeoutInMinutes, out banTimeoutInMinutes))
+            {
+                _banTimeoutInMinutes = banTimeoutInMinutes;
+            }
+
+            string configTrustedIpRegex = System.Configuration.ConfigurationManager.AppSettings.Get("DoSAttackModule.TrustedIpRegex");
+            if (!string.IsNullOrEmpty(configTrustedIpRegex))
+            {
+                Regex trustedIpRegex = null;
+                try
+                {
+                    trustedIpRegex = new Regex(configTrustedIpRegex, RegexOptions.Compiled);
+                }
+                catch(ArgumentException)
+                {
+                    Trace.WriteLine(string.Format("Failed to parse AppSetting[DoSAttackModule.TrustedIpRegex]: '{0}'", configTrustedIpRegex));
+                }
+                if(trustedIpRegex != null)
+                {
+                    _trustedIpRegex = trustedIpRegex;
+                }
+                else
+                {
+                    _trustedIpRegex = new Regex(DEFAULT_TRUSTED_IP_REGEX, RegexOptions.Compiled);
+                }
+            }
+        }
 
         public void Dispose()
         {}
@@ -32,25 +87,21 @@ namespace nv.Web.Modules
         private void BeginRequest(object sender, EventArgs e)
         {
  	        string ip = HttpContext.Current.Request.UserHostAddress;
-            if(ip.StartsWith("10.10.0.")
-               || ip.StartsWith("192.168.")
-               || ip == "127.0.0.1"
-               || ip == "::1"
-               || ip == "0.0.0.0") 
+            if(_trustedIpRegex.IsMatch(ip))
             {
                 if (HttpContext.Current.Request.QueryString != null) {
-                    if(!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["DOSTest"])) 
+                    if(!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["DOSTest"]))
                     {
                         // Allow admins to force this to run even if they're on local IPs for testing
                         CheckIpAddress(ip);
                         CleanupData();
                     }
-                    if(!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["ShowDOSInfo"])) 
+                    if(!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["ShowDOSInfo"]))
                     {
-                        lock (_ipBannedUntil) 
+                        lock (_ipBannedUntil)
                         {
                             HttpContext.Current.Response.Write("Blocked Count:" + _ipBannedUntil.Keys.Count() + "<BR />");
-                            foreach (KeyValuePair<string, DateTime> kvp in _ipBannedUntil) 
+                            foreach (KeyValuePair<string, DateTime> kvp in _ipBannedUntil)
                             {
                                 HttpContext.Current.Response.Write("Blocked IP:" + kvp.Key + " Until:" + kvp.Value + "<BR />");
                             }
@@ -64,7 +115,7 @@ namespace nv.Web.Modules
                             }
                         }
                     }
-                    if(!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["ClearDOSInfo"])) 
+                    if(!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["ClearDOSInfo"]))
                     {
                         lock (_ipBannedUntil)
                         {
@@ -82,7 +133,7 @@ namespace nv.Web.Modules
                 CleanupData();
             }
 
-            lock(_ipBannedUntil) 
+            lock(_ipBannedUntil)
             {
                 if(_ipBannedUntil.ContainsKey(ip))
                 {
@@ -109,7 +160,7 @@ namespace nv.Web.Modules
                 _isCleanRunning = true;
                 try {
                     long secondsSinceLastClean = (long)(DateTime.Now - _dateLastCleaned).TotalSeconds;
-                    if (secondsSinceLastClean > REDUCTION_INTERVAL_IN_SECONDS) {
+                    if (secondsSinceLastClean > _cleanupFrequencyInSeconds) {
                         byte reduction;
                         if (secondsSinceLastClean > 60)
                         {
@@ -122,7 +173,7 @@ namespace nv.Web.Modules
 
                         secondsSinceLastClean = secondsSinceLastClean + 1;
 
-                        // it has been at least REDUCTION_INTERVAL_SECONDS since we last cleaned (makes sure we don't clean too often!) 
+                        // it has been at least _cleanupFrequencyInSeconds since we last cleaned (makes sure we don't clean too often!) 
                         // sets the time interval for basis of number of open connections.
                         // First reduce counts on ip table.
                         List<string> ips = _ipAddresses.Keys.ToList();
@@ -133,7 +184,7 @@ namespace nv.Web.Modules
                             {
                                 _ipAddresses.Remove(ip);
                             }
-                            else 
+                            else
                             {
                                 _ipAddresses[ip] = (byte)(concurrentRequests - reduction);
                             }
@@ -147,11 +198,11 @@ namespace nv.Web.Modules
         }
 
         /// <summary>
-        /// Checks the requesting IP address in the collection and bans the IP, if required. 
+        /// Checks the requesting IP address in the collection and bans the IP, if required.
         /// </summary>
         private void CheckIpAddress(string ip)
         {
-            lock (_ipAddresses) 
+            lock (_ipAddresses)
             {
                 if (!_ipAddresses.ContainsKey(ip))
                 {
@@ -160,21 +211,21 @@ namespace nv.Web.Modules
                 }
 
                 short concurrentRequests = _ipAddresses[ip];
-                if (concurrentRequests > MAX_CONCURRENT_REQUESTS)
+                if (concurrentRequests > _maxConcurrentRequests)
                 {
                     lock (_ipBannedUntil)
                     {
                         if (!_ipBannedUntil.ContainsKey(ip))
                         {
-                            _ipBannedUntil[ip] = DateTime.Now.AddMinutes(RELEASE_INTERVAL_IN_MINUTES);
+                            _ipBannedUntil[ip] = DateTime.Now.AddMinutes(_banTimeoutInMinutes);
                             _ipAddresses.Remove(ip);
                             NotifyBan(ip, HttpContext.Current.Request);
                         }
                     }
                 }
-                else 
+                else
                 {
-                    _ipAddresses[ip] = (byte) (concurrentRequests + 1); 
+                    _ipAddresses[ip] = (byte) (concurrentRequests + 1);
                 }
             }
         }
@@ -183,20 +234,20 @@ namespace nv.Web.Modules
         {
             Trace.WriteLine("ban " + ip);
         }
-        
+
         void EndRequest(object sender, EventArgs e)
         {
  	        // If the request ends, let's remove a call from this user (the count will now be how many incomplete requests they have)
             string ip = HttpContext.Current.Request.UserHostAddress;
-            lock(_ipAddresses) 
+            lock(_ipAddresses)
             {
                 if(_ipAddresses.ContainsKey(ip)) {
-                    short myInt = _ipAddresses[ip];                    
-                    if(myInt - 1 <= 0) 
+                    short myInt = _ipAddresses[ip];
+                    if(myInt - 1 <= 0)
                     {
                         _ipAddresses.Remove(ip);
                     }
-                    else 
+                    else
                     {
                         _ipAddresses[ip] = (byte)(myInt - 1);
                     }
