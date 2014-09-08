@@ -2,6 +2,7 @@
 using nv.Web.Modules;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -13,7 +14,8 @@ namespace nv.Web.Modules
     {
         public static void PreApplicationStart()
         {
-            DynamicModuleUtility.RegisterModule(typeof(DoSAttackModule));
+            Trace.WriteLine("Added NGP VAN Banhammer IHttpModule.");
+            DynamicModuleUtility.RegisterModule(typeof(BanhammerModule));
         }
     }
 }
