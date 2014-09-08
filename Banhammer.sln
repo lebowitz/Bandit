@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nv.Web.Modules", "nv.Web.DoSModule\nv.Web.Modules.csproj", "{31C1FDC1-B74E-49B8-B4B8-136E3BA9A5F9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp", "DemoApp\DemoApp.csproj", "{3260AD5C-FEE6-42E6-AC3C-4CE1B5BD1CA3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoAttack", "DemoAttack\DemoAttack.csproj", "{E1E58AA9-465C-492F-936A-7FC30265C730}"
@@ -14,16 +12,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Local.testsettings = Local.testsettings
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banhammer", "Banhammer\Banhammer.csproj", "{31C1FDC1-B74E-49B8-B4B8-136E3BA9A5F9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{83A3512C-10B3-4ABD-9C69-5AC80D829F06}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{31C1FDC1-B74E-49B8-B4B8-136E3BA9A5F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{31C1FDC1-B74E-49B8-B4B8-136E3BA9A5F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{31C1FDC1-B74E-49B8-B4B8-136E3BA9A5F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{31C1FDC1-B74E-49B8-B4B8-136E3BA9A5F9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3260AD5C-FEE6-42E6-AC3C-4CE1B5BD1CA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3260AD5C-FEE6-42E6-AC3C-4CE1B5BD1CA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3260AD5C-FEE6-42E6-AC3C-4CE1B5BD1CA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -32,6 +35,10 @@ Global
 		{E1E58AA9-465C-492F-936A-7FC30265C730}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1E58AA9-465C-492F-936A-7FC30265C730}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1E58AA9-465C-492F-936A-7FC30265C730}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31C1FDC1-B74E-49B8-B4B8-136E3BA9A5F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31C1FDC1-B74E-49B8-B4B8-136E3BA9A5F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31C1FDC1-B74E-49B8-B4B8-136E3BA9A5F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31C1FDC1-B74E-49B8-B4B8-136E3BA9A5F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

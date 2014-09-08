@@ -14,14 +14,14 @@ using Amazon.SimpleNotificationService.Model;
 using Newtonsoft.Json;
 using System.Timers;
 
-namespace nv.Web.Modules
+namespace Banhammer
 {
     public class BanhammerModule : IHttpModule
     {
         private const string DEFAULT_TRUSTED_IP_REGEX = @"^10\.10\.0\.|^192\.168\.|^127\.0\.0\.1$|^::1$|^0\.0\.0\.0$";
         private static Dictionary<string, byte> _ipAddresses = new Dictionary<string, byte>();
         private static Dictionary<string,DateTime> _ipBannedUntil = new System.Collections.Generic.Dictionary<string,DateTime>();
-        private static byte _requestsPerSecondMax = 8;
+        private static byte _MaxRequestsPerSecond = 8;
         private static int _banTimeoutInMinutes = 2;
         private static Regex _trustedIpRegex = new Regex(DEFAULT_TRUSTED_IP_REGEX, RegexOptions.Compiled);
         private static Amazon.SimpleNotificationService.AmazonSimpleNotificationServiceClient _snsClient;
@@ -138,7 +138,7 @@ namespace nv.Web.Modules
                 }
 
                 short concurrentRequests = _ipAddresses[ip];
-                if (concurrentRequests > _requestsPerSecondMax)
+                if (concurrentRequests > _MaxRequestsPerSecond)
                 {
                     lock (_ipBannedUntil)
                     {
@@ -176,11 +176,11 @@ namespace nv.Web.Modules
 
         private static void Configure()
         {
-            string configRequestsPerSecondMax = System.Configuration.ConfigurationManager.AppSettings.Get("Banhammer.RequestsPerSecondMax");
-            byte requestsPerSecondMax;
-            if (byte.TryParse(configRequestsPerSecondMax, out requestsPerSecondMax))
+            string configMaxRequestsPerSecond = System.Configuration.ConfigurationManager.AppSettings.Get("Banhammer.MaxRequestsPerSecond");
+            byte MaxRequestsPerSecond;
+            if (byte.TryParse(configMaxRequestsPerSecond, out MaxRequestsPerSecond))
             {
-                _requestsPerSecondMax = requestsPerSecondMax;
+                _MaxRequestsPerSecond = MaxRequestsPerSecond;
             }
 
             string configBanTimeoutInMinutes = System.Configuration.ConfigurationManager.AppSettings.Get("Banhammer.BanTimeoutInMinutes");
