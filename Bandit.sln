@@ -3,16 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp", "DemoApp\DemoApp.csproj", "{3260AD5C-FEE6-42E6-AC3C-4CE1B5BD1CA3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bandit.Demo", "Bandit.Demo\Bandit.Demo.csproj", "{3260AD5C-FEE6-42E6-AC3C-4CE1B5BD1CA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoAttack", "DemoAttack\DemoAttack.csproj", "{E1E58AA9-465C-492F-936A-7FC30265C730}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bandit.Tests", "Bandit.Tests\Bandit.Tests.csproj", "{E1E58AA9-465C-492F-936A-7FC30265C730}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{416C250C-6086-4D85-98C9-DC5013B73FE6}"
 	ProjectSection(SolutionItems) = preProject
 		Local.testsettings = Local.testsettings
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banhammer", "Banhammer\Banhammer.csproj", "{31C1FDC1-B74E-49B8-B4B8-136E3BA9A5F9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bandit", "Bandit\Bandit.csproj", "{31C1FDC1-B74E-49B8-B4B8-136E3BA9A5F9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{83A3512C-10B3-4ABD-9C69-5AC80D829F06}"
 	ProjectSection(SolutionItems) = preProject

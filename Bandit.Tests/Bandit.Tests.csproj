@@ -9,8 +9,8 @@
     <ProjectGuid>{E1E58AA9-465C-492F-936A-7FC30265C730}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DemoAttack</RootNamespace>
-    <AssemblyName>DemoAttack</AssemblyName>
+    <RootNamespace>Bandit.Tests</RootNamespace>
+    <AssemblyName>Bandit.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

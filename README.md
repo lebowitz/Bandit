@@ -1,7 +1,7 @@
-NGP VAN Banhammer
+NGP VAN Bandit
 ==============
 
-Banhammer is an ASP.NET module which limits the number of requests per second that can come from a single IP address.  The requests per second and ban interval are configurable.  Notification of bans is provided.
+Banhammer is an ASP.NET HttpModule.  It limits the number of requests per second that can come from a single IP address.  The requests per second and ban interval are configurable.  Bans are published to an SNS topic.
 
 ###Installation
 
@@ -13,7 +13,7 @@ Set the AppSettings keys `Banhammer.Notifier.AwsAccessKey`, `Banhammer.Notifier.
 
 ###Testing
 
-The included sample project DemoApp shows a site which is configured for Banhammer.  DemoAttack is a web load test to test making repeated requests from the same ip.   
+The included sample project DemoApp shows a site which is configured for Banhammer.  `DemoAttack/Attack.loadtest` helps make repeated requests from the same IP.  Requests count toward then ban: (1) when the either don't match TrustedIpRegex, or (2) have the `Banhammer.Test` querystring variable set.
 
 ###Configuration
 
@@ -33,4 +33,5 @@ The following query string variables are available for testing:
 * ```?Banhammer.Clear=1``` clear the bans and IP counts.
 
 ### Todo
-* Expose REST endpoints for `GET /Banhammer/Info` and `DELETE /Banhammer/Bans`  
+* Hammer graphic
+* Expose REST endpoints for `GET /Banhammer/Info` and `DELETE /Banhammer/Bans`

@@ -11,8 +11,8 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DemoApp</RootNamespace>
-    <AssemblyName>DemoApp</AssemblyName>
+    <RootNamespace>Bandit.Demo</RootNamespace>
+    <AssemblyName>Bandit.Demo</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
@@ -246,9 +246,9 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Banhammer\Banhammer.csproj">
+    <ProjectReference Include="..\Bandit\Bandit.csproj">
       <Project>{31c1fdc1-b74e-49b8-b4b8-136e3ba9a5f9}</Project>
-      <Name>Banhammer</Name>
+      <Name>Bandit</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
