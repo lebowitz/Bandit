@@ -7,8 +7,8 @@
     <ProjectGuid>{31C1FDC1-B74E-49B8-B4B8-136E3BA9A5F9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Banhammer</RootNamespace>
-    <AssemblyName>Banhammer</AssemblyName>
+    <RootNamespace>Bandit</RootNamespace>
+    <AssemblyName>Bandit</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
