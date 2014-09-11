@@ -188,7 +188,6 @@ namespace Bandit
                 req.TopicArn = _snsTopic;
                 Trace.Write(JsonConvert.SerializeObject(req));
                 PublishResponse res = _snsClient.Publish(req);
-                Trace.Write(JsonConvert.SerializeObject(res));
             }
         }
 
