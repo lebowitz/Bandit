@@ -20,19 +20,23 @@ namespace Bandit
     {
         private const string DEFAULT_TRUSTED_IP_REGEX = @"^10\.10\.0\.|^192\.168\.|^127\.0\.0\.1$|^::1$|^0\.0\.0\.0$";
         private static byte _maxRequestsPerSecond = 8;
-        private static TimeSpan BanDuration = TimeSpan.FromMinutes(2);
+        private static TimeSpan _banDuration = TimeSpan.FromMinutes(2);
         private static Dictionary<string, byte> _ipAddresses = new Dictionary<string, byte>();
         private static Dictionary<string,DateTime> _ipBannedUntil = new System.Collections.Generic.Dictionary<string,DateTime>();
         private static Regex _trustedIpRegex = new Regex(DEFAULT_TRUSTED_IP_REGEX, RegexOptions.Compiled);
         private static Amazon.SimpleNotificationService.AmazonSimpleNotificationServiceClient _snsClient;
         private static string _snsTopic;
         private static Timer _cleanupTimer = new Timer { Interval = TimeSpan.FromSeconds(1).TotalMilliseconds, Enabled = true };
+        private static bool _isEnabled = true;
 
         static BanditModule()
         {
-            _cleanupTimer.Elapsed += _cleanupTimer_Elapsed;
-            _cleanupTimer.Start();
             Configure();
+            if (_isEnabled)
+            {
+                _cleanupTimer.Elapsed += _cleanupTimer_Elapsed;
+                _cleanupTimer.Start();
+            }
         }
 
         static void _cleanupTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -48,7 +52,10 @@ namespace Bandit
 
         public void Init(HttpApplication context)
         {
- 	        context.BeginRequest += BeginRequest;
+            if (_isEnabled)
+            {
+                context.BeginRequest += BeginRequest;
+            }
         }
 
         private void BeginRequest(object sender, EventArgs e)
@@ -57,15 +64,15 @@ namespace Bandit
             if(_trustedIpRegex.IsMatch(ip))
             {
                 if (HttpContext.Current.Request.QueryString != null) {
-                    if (!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["Bandit.Test"]))
+                    if (!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["BanditTest"]))
                     {
                         CheckIpAddress(ip);
                     }
-                    if (!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["Bandit.Info"]))
+                    if (!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["BanditInfo"]))
                     {
                         WriteInfoToResponse();
                     }
-                    if (!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["Bandit.Clear"]))
+                    if (!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["BanditClear"]))
                     {
                         Clear();
                     }
@@ -154,7 +161,7 @@ namespace Bandit
                     {
                         if (!_ipBannedUntil.ContainsKey(ip))
                         {
-                            _ipBannedUntil[ip] = DateTime.Now + BanDuration;
+                            _ipBannedUntil[ip] = DateTime.Now + _banDuration;
                             _ipAddresses.Remove(ip);
                             NotifyBan(ip, HttpContext.Current.Request);
                         }
@@ -171,7 +178,7 @@ namespace Bandit
 
         private void NotifyBan(string ip, HttpRequest httpRequest)
         {
-            string banText = string.Format("Banned for {0} minutes.\n\nMachine {1}\nIP: {2}\nUseragent: {3}\nURL: {4}", BanDuration, Environment.MachineName, ip, httpRequest.UserAgent, httpRequest.Url);
+            string banText = string.Format("Banned for {0} seconds.\n\nMachine {1}\nIP: {2}\nUseragent: {3}\nURL: {4}", _banDuration.TotalSeconds, Environment.MachineName, ip, httpRequest.UserAgent, httpRequest.Url);
 
             Trace.WriteLine(banText);
 
@@ -187,6 +194,7 @@ namespace Bandit
 
         private static void Configure()
         {
+            Trace.WriteLine("Read Configuration");
             string configMaxRequestsPerSecond = System.Configuration.ConfigurationManager.AppSettings.Get("Bandit.MaxRequestsPerSecond");
             byte MaxRequestsPerSecond;
             if (byte.TryParse(configMaxRequestsPerSecond, out MaxRequestsPerSecond))
@@ -194,12 +202,26 @@ namespace Bandit
                 _maxRequestsPerSecond = MaxRequestsPerSecond;
             }
 
+            Trace.WriteLine("MaxRequestsPerSecond: " + _maxRequestsPerSecond);
+
             string configBanDuration = System.Configuration.ConfigurationManager.AppSettings.Get("Bandit.BanDuration");
-            TimeSpan _banDuration;
-            if (TimeSpan.TryParse(configBanDuration, out _banDuration))
+            TimeSpan banDuration = TimeSpan.MaxValue;
+            if (!string.IsNullOrEmpty(configBanDuration) && TimeSpan.TryParse(configBanDuration, out banDuration))
             {
-                BanDuration = _banDuration;
+                _banDuration = banDuration;
             }
+
+            Trace.WriteLine("BanDuration: " + _banDuration);
+
+            string configIsEnabled = System.Configuration.ConfigurationManager.AppSettings.Get("Bandit.IsEnabled");
+            bool isEnabled;
+            if (bool.TryParse(configIsEnabled, out isEnabled))
+            {
+                _isEnabled = isEnabled;
+            }
+
+            Trace.WriteLine("IsEnabled: " + _isEnabled);
+
 
             string configTrustedIpRegex = System.Configuration.ConfigurationManager.AppSettings.Get("Bandit.TrustedIpRegex");
             if (!string.IsNullOrEmpty(configTrustedIpRegex))
@@ -219,6 +241,8 @@ namespace Bandit
                 }
             }
 
+            Trace.WriteLine("TrustedIpRegex: " + _trustedIpRegex.ToString());
+
             string awsKey = ConfigurationManager.AppSettings["Bandit.Notifier.AwsAccessKey"];
             string awsSecret = ConfigurationManager.AppSettings["Bandit.Notifier.AwsSecretKey"];
             string awsSnsTopic = ConfigurationManager.AppSettings["Bandit.Notifier.AwsSnsTopic"];
@@ -226,6 +250,7 @@ namespace Bandit
                 && !string.IsNullOrEmpty(awsSecret)
                 && !string.IsNullOrEmpty(awsSnsTopic))
             {
+                Trace.WriteLine("AwsSnsTopic: " + awsSnsTopic.ToString());
                 var creds = new BasicAWSCredentials(awsKey, awsSecret);
                 _snsTopic = awsSnsTopic;
                 _snsClient = new Amazon.SimpleNotificationService.AmazonSimpleNotificationServiceClient(creds, new Amazon.SimpleNotificationService.AmazonSimpleNotificationServiceConfig() { RegionEndpoint = Amazon.RegionEndpoint.USEast1, ReadEntireResponse = true, LogResponse = true, ServiceURL = "https://sns.us-east-1.amazonaws.com/" });
