@@ -26,8 +26,11 @@ build:
   publish_nuget: true
   verbosity: normal
 
+after_build:
+  - cmd: nuget pack .nuspec -Version {version}
+
 artifacts:
-  - path: '**\*.nupkg'
+  - path: 'bandit*.nupkg'
 
 deploy:  
   - provider: NuGet
