@@ -3,6 +3,8 @@ NGP VAN Bandit
 
 Bandit is an ASP.NET HttpModule.  It limits the number of requests per second that can come from a single IP address.  The requests per second and ban interval are configurable.  Bans are published to an SNS topic.
 
+[![Build status](https://ci.appveyor.com/api/projects/status/k4idpocpwmiol1nn/branch/master)](https://ci.appveyor.com/project/lebowitz/bandit/branch/master)
+
 ###Installation
 
 Add reference to the nuget package.  At application start, the HTTPModule is automatically registered. 
