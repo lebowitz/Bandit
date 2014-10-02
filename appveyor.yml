@@ -11,7 +11,6 @@ os: Windows Server 2012
 init:
   - git config --global core.autocrlf input
 
-# enable patching of AssemblyInfo.* files
 assembly_info:
   patch: true
   file: AssemblyInfo.*
@@ -26,15 +25,9 @@ build:
   project: Bandit.sln
   publish_nuget: true
   verbosity: normal
- 
-# scripts to run before build
-before_build:
-
-# scripts to run after build
-after_build:
 
 artifacts:
-  - path: *.nupkg
+  - path: '**\*.nupkg'
 
 deploy:  
   - provider: NuGet
