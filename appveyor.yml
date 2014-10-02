@@ -24,7 +24,7 @@ configuration: Debug
 build:
   project: Bandit.sln
   publish_nuget: true
-  verbosity: normal
+  verbosity: minimal
 
 after_build:
   - cmd: nuget pack .nuspec -Version %APPVEYOR_BUILD_VERSION%
