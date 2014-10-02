@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+    <metadata>
+        <id>bandit</id>
+        <version>0.0.0</version>
+        <authors>Craig Lebowitz</authors>
+        <owners>Craig Lebowitz</owners>
+        <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
+        <projectUrl>https://github.com/lebowitz/Bandit/</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>ASP.NET zero-configuration HttpModule for preventing Denial-Of-Service attacks</description>
+        <language>en-US</language>
+        <tags>bandit dos ddos httpmodule aspnet</tags>
+        <dependencies>
+            <group targetFramework=".NETFramework4.0">
+                <dependency id="WebActivatorEx" version="2.0.5" />
+                <dependency id="AWSSDK" version="2.3.1.0" />
+                <dependency id="Newtonsoft.Json" version="6.0.5" />
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="Bandit\bin\Debug\Bandit.dll" target="lib\net40\Bandit.dll" />
+    </files>
+</package>

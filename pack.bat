@@ -1,0 +1,1 @@
+.\.nuget\nuget.exe pack .nuspec -Version 1.0.3 -Symbols

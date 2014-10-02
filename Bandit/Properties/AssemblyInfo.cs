@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("nv.Web.DoSModule")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("bandit")]
+[assembly: AssemblyDescription("ASP.NET zero-configuration HttpModule for preventing Denial-Of-Service attacks")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("NGP VAN")]
-[assembly: AssemblyProduct("nv.Web.DoSModule")]
-[assembly: AssemblyCopyright("Copyright © NGP VAN 2014")]
+[assembly: AssemblyCompany("Craig Lebowitz")]
+[assembly: AssemblyProduct("bandit")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
