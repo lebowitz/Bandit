@@ -60,7 +60,7 @@ namespace Bandit
 
         private void BeginRequest(object sender, EventArgs e)
         {
- 	        string ip = HttpContext.Current.Request.UserHostAddress;
+            string ip = GetIPAddress();
             if(_trustedIpRegex.IsMatch(ip))
             {
                 if (HttpContext.Current.Request.QueryString != null) {
@@ -254,6 +254,38 @@ namespace Bandit
                 _snsTopic = awsSnsTopic;
                 _snsClient = new Amazon.SimpleNotificationService.AmazonSimpleNotificationServiceClient(creds, new Amazon.SimpleNotificationService.AmazonSimpleNotificationServiceConfig() { RegionEndpoint = Amazon.RegionEndpoint.USEast1, ReadEntireResponse = true, LogResponse = true, ServiceURL = "https://sns.us-east-1.amazonaws.com/" });
             }
+        }
+        private string GetIPAddress()
+        {
+            System.Web.HttpContext context = System.Web.HttpContext.Current;
+
+            if (context == null || context.Request == null) {
+                return "::1";
+            }
+
+            string ipAddress = context.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+
+            if (string.IsNullOrEmpty(ipAddress) && context.Request.Headers != null)
+            {
+                ipAddress = context.Request.Headers["X-Forwarded-For"];
+            }
+
+            if (!string.IsNullOrEmpty(ipAddress))
+            {
+                string[] addresses = ipAddress.Split(',');
+                if (addresses.Length != 0)
+                {
+                    return addresses[0];
+                }
+            }
+
+            string remoteAddress = context.Request.ServerVariables["REMOTE_ADDR"];
+            if (!string.IsNullOrEmpty(remoteAddress))
+            {
+                return remoteAddress;
+            }
+
+            return HttpContext.Current.Request.UserHostAddress;
         }
     }
 }
