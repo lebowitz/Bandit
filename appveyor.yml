@@ -1,0 +1,44 @@
+version: 1.0.{build}
+
+branches:
+  only:
+    - master
+
+# Operating system (build VM template)
+os: Windows Server 2012
+
+# scripts that are called at very beginning, before repo cloning
+init:
+  - git config --global core.autocrlf input
+
+# enable patching of AssemblyInfo.* files
+assembly_info:
+  patch: true
+  file: AssemblyInfo.*
+  assembly_version: "1.0.{build}"
+  assembly_file_version: "{version}"
+  assembly_informational_version: "{version}"
+
+platform: Any CPU
+configuration: Debug
+
+build:
+  project: Bandit.sln
+  publish_nuget: true
+  verbosity: normal
+ 
+# scripts to run before build
+before_build:
+
+# scripts to run after build
+after_build:
+
+artifacts:
+  - path: *.nupkg
+
+deploy:  
+  - provider: NuGet
+    server:
+    api_key:
+      secure: E0lMCUcNqwFW1vF2c42rVsygpz62qf6ueYkuRNsUUS/W4nPgvi3hdYhzja+Wxab+
+    artifact: /.*\.nupkg/
