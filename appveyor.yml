@@ -27,7 +27,7 @@ build:
   verbosity: normal
 
 after_build:
-  - cmd: nuget pack .nuspec -Version {version}
+  - cmd: nuget pack .nuspec -Version %APPVEYOR_BUILD_VERSION%
 
 artifacts:
   - path: 'bandit*.nupkg'
