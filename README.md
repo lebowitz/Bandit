@@ -32,5 +32,10 @@ The following query string variables are available for testing:
 * ```?Bandit.Clear=1``` clear the bans and IP counts.
 
 ### Todo
+
+* Implement incremental delays instead of killing the page (optionally): http://jasonwatmore.com/post/2015/06/03/CSharp-Incremental-Delay-to-Prevent-Brute-Force-or-Dictionary-Attack.aspx
+
+* Add support for longer check intervals than one second (currently hardcoded). For example, to stop  bots that constantly, but slowly tries brute force or sql injection attacks over a number of hours or days.
+
 * Hammer graphic
 * Expose REST endpoints for `GET /Bandit/Info` and `DELETE /Bandit/Bans`
